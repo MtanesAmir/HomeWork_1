@@ -8,7 +8,9 @@ from typing import Any, Dict, List
 
 from homework_1.services import (
     SinusWave,
+    generate_dataset,
     generate_sinus_samples,
+    save_dataset,
     sum_sinus_lists,
     sum_sinus_waves,
 )
@@ -93,3 +95,18 @@ class HomeWorkSDK:
             )
 
         return self.gatekeeper.execute(_execute_wave_sum)
+
+    def generate_and_save_dataset(self, num_rows: int, noise_factor: float) -> Dict[str, Any]:
+        """Generates the labeled dataset and saves it to disk safely via the Gatekeeper."""
+
+        def _execute_pipeline() -> Dict[str, Any]:
+            output_path = self.config_manager.get("dataset_output_path", "results/dataset.json")
+            dataset = generate_dataset(num_rows=num_rows, noise_factor=noise_factor)
+            save_dataset(dataset, output_path)
+            return {
+                "rows_generated": num_rows,
+                "saved_to": output_path,
+                "status": "completed",
+            }
+
+        return self.gatekeeper.execute(_execute_pipeline)

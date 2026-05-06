@@ -6,5 +6,28 @@
   "logging": {
     "level": "INFO",
     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-  }
+  },
+  "dataset_output_path": "results/dataset.json",
+  "waves": [
+    {
+      "amplitude": 1.0,
+      "frequency": 5.0,
+      "phase": 0.0
+    },
+    {
+      "amplitude": 1.5,
+      "frequency": 10.0,
+      "phase": 0.5
+    },
+    {
+      "amplitude": 2.0,
+      "frequency": 15.0,
+      "phase": 1.0
+    },
+    {
+      "amplitude": 0.5,
+      "frequency": 20.0,
+      "phase": 1.5
+    }
+  ]
 }

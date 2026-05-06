@@ -68,6 +68,13 @@ def main() -> int:
         print(f"Summed Wave Count: {len(sum_waves_resp['result'])}")
         print(f"First 5 Summed Samples: {sum_waves_resp['result'][:5]}")
 
+        # --- Dataset Generation Pipeline ---
+        print("\n--- Dataset Generation Pipeline ---")
+        dataset_resp = sdk.generate_and_save_dataset(num_rows=50, noise_factor=0.05)
+        print(f"Status: {dataset_resp['status']}")
+        print(f"Rows Generated: {dataset_resp['result']['rows_generated']}")
+        print(f"Database Saved To: {dataset_resp['result']['saved_to']}")
+
         print("\n=== Successful Bootstrap Execution ===")
         return 0
     except Exception as e:
