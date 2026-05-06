@@ -29,5 +29,12 @@
       "frequency": 20.0,
       "phase": 1.5
     }
-  ]
+  ],
+  "models": {
+    "epochs": 50,
+    "train_percentage": 70.0,
+    "val_percentage": 15.0,
+    "test_percentage": 15.0,
+    "hidden_layers": [3, 5, 3]
+  }
 }

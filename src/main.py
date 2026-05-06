@@ -75,6 +75,23 @@ def main() -> int:
         print(f"Rows Generated: {dataset_resp['result']['rows_generated']}")
         print(f"Database Saved To: {dataset_resp['result']['saved_to']}")
 
+        # --- Deep Learning Models Training ---
+        print("\n--- Deep Learning Models: FCN, RNN, LSTM Training ---")
+        # Configure quick 20-epoch runs for demonstration to show periodic prints (1, 10, 20)
+        sdk.config_manager._setup_config["models"]["epochs"] = 20
+
+        print("\n>> Training Fully Connected Network (FCN)...")
+        fcn_train = sdk.train_fcn()
+        print(f"FCN Train Status: {fcn_train['status']}")
+
+        print("\n>> Training Recurrent Neural Network (RNN)...")
+        rnn_train = sdk.train_rnn()
+        print(f"RNN Train Status: {rnn_train['status']}")
+
+        print("\n>> Training Long Short-Term Memory (LSTM)...")
+        lstm_train = sdk.train_lstm()
+        print(f"LSTM Train Status: {lstm_train['status']}")
+
         print("\n=== Successful Bootstrap Execution ===")
         return 0
     except Exception as e:
