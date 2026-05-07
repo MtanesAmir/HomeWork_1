@@ -26,6 +26,7 @@ def compute_and_draw_screen1_plots(*args: Any) -> Tuple[go.Figure, go.Figure, Li
         fig_overlay.add_trace(go.Scatter(x=t_samples, y=sig, name=f"Sinusoid {idx + 1}"))
     fig_overlay.update_layout(
         margin={"l": 20, "r": 20, "t": 20, "b": 20},
+        height=220,  # Restricts height to fit on a single screen
         xaxis_title="Time (s)",
         yaxis_title="Amplitude",
     )
@@ -34,6 +35,7 @@ def compute_and_draw_screen1_plots(*args: Any) -> Tuple[go.Figure, go.Figure, Li
     fig_sum.add_trace(go.Scatter(x=t_samples, y=sum_signal, line_color="#0d6efd", name="Sum"))
     fig_sum.update_layout(
         margin={"l": 20, "r": 20, "t": 20, "b": 20},
+        height=220,  # Restricts height to fit on a single screen
         xaxis_title="Time (s)",
         yaxis_title="Amplitude",
     )

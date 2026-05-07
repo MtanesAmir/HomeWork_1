@@ -77,10 +77,10 @@ def test_gui_screen1_sliders_plotting_callback() -> None:
     """Asserts that adjusting wave component sliders updates Plotly Cartesian overlay coordinates."""
     # Mock updates
     fig_overlay, fig_sum = update_screen1_plots(
-        5.0, 0.0, 1.0,  # wave 1
-        10.0, 0.5, 1.5, # wave 2
-        15.0, 1.0, 2.0, # wave 3
-        20.0, 1.5, 0.5  # wave 4
+        1.0, 0.0, 1.0,  # wave 1
+        2.5, 0.5, 1.5,  # wave 2
+        5.0, -1.0, 2.0, # wave 3
+        8.0, 1.5, 0.5   # wave 4
     )
 
     # Cartesian validation overlays check
@@ -92,7 +92,7 @@ def test_gui_screen1_sliders_plotting_callback() -> None:
 
 
 def test_gui_slider_frequency_limits() -> None:
-    """Asserts that Screen 1 sinusoid cards sliders limit frequency maximum inputs strictly to 50.0 Hz."""
+    """Asserts that Screen 1 sinusoid cards sliders limit frequency maximum inputs strictly to 10.0 Hz."""
     card_layout = get_screen1_layout()
     assert card_layout is not None
     # Extract components to check card slider limits
@@ -100,7 +100,10 @@ def test_gui_slider_frequency_limits() -> None:
     card = s1.get_sinusoid_card(1, 5.0, 0.0, 1.0)
     slider = card.children[2]  # Freq slider
     assert slider.min == 0.1
-    assert slider.max == 50.0  # Confirms limit is exactly 50 Hz
+    assert slider.max == 10.0  # Confirms limit is exactly 10 Hz
+    slider_phase = card.children[4]  # Phase slider
+    assert slider_phase.min == -3.14
+    assert slider_phase.max == 3.14
 
 
 def test_gui_screen2_async_progress_callback() -> None:

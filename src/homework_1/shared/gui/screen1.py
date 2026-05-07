@@ -22,9 +22,9 @@ def get_sinusoid_card(idx: int, default_freq: float, default_phase: float, defau
         children=[
             html.H5(f"Sinusoid {idx}", style={"textAlign": "center", "fontWeight": "bold", "color": "#495057"}),
             html.Label("Freq (Hz)", style={"fontWeight": "bold", "marginTop": "5px"}),
-            dcc.Slider(id=f"freq-{idx}", min=0.1, max=50.0, step=0.1, value=default_freq, tooltip={"placement": "bottom"}),
+            dcc.Slider(id=f"freq-{idx}", min=0.1, max=10.0, step=0.1, value=default_freq, tooltip={"placement": "bottom"}),
             html.Label("Phase (rad)", style={"fontWeight": "bold", "marginTop": "5px"}),
-            dcc.Slider(id=f"phase-{idx}", min=-6.28, max=6.28, step=0.1, value=default_phase, tooltip={"placement": "bottom"}),
+            dcc.Slider(id=f"phase-{idx}", min=-3.14, max=3.14, step=0.05, value=default_phase, tooltip={"placement": "bottom"}),
             html.Label("Amp", style={"fontWeight": "bold", "marginTop": "5px"}),
             dcc.Slider(id=f"amp-{idx}", min=0.0, max=2.0, step=0.1, value=default_amp, tooltip={"placement": "bottom"}),
         ],
@@ -72,29 +72,29 @@ def get_screen1_layout() -> html.Div:
                     html.Div(
                         style={"display": "flex", "justifyContent": "space-between"},
                         children=[
-                            get_sinusoid_card(1, 5.0, 0.0, 1.0),
-                            get_sinusoid_card(2, 10.0, 0.5, 1.5),
-                            get_sinusoid_card(3, 15.0, 1.0, 2.0),
-                            get_sinusoid_card(4, 20.0, 1.5, 0.5),
+                            get_sinusoid_card(1, 1.0, 0.0, 1.0),
+                            get_sinusoid_card(2, 2.5, 0.5, 1.5),
+                            get_sinusoid_card(3, 5.0, -1.0, 2.0),
+                            get_sinusoid_card(4, 8.0, 1.5, 0.5),
                         ],
                     ),
                     # Alerts Section
                     html.Div(id="validation-alert-container", style={"marginTop": "10px"}),
-                    # Cartesian Plots Grid
+                    # Cartesian Plots Stacked vertically (100% wide)
                     html.Div(
-                        style={"display": "flex", "justifyContent": "space-between", "marginTop": "20px"},
+                        style={"display": "flex", "flexDirection": "column", "marginTop": "10px"},
                         children=[
                             html.Div(
-                                style={"width": "48%", "backgroundColor": "#ffffff", "padding": "15px", "borderRadius": "10px", "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.05)"},
+                                style={"width": "100%", "backgroundColor": "#ffffff", "padding": "10px", "borderRadius": "10px", "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.05)", "marginBottom": "10px"},
                                 children=[
-                                    html.H5("Sinusoidal Wave Overlays", style={"fontWeight": "bold", "textAlign": "center"}),
+                                    html.H5("Sinusoidal Wave Overlays", style={"fontWeight": "bold", "textAlign": "center", "margin": "0 0 5px 0", "fontSize": "15px"}),
                                     dcc.Graph(id="plot-components-overlay"),
                                 ],
                             ),
                             html.Div(
-                                style={"width": "48%", "backgroundColor": "#ffffff", "padding": "15px", "borderRadius": "10px", "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.05)"},
+                                style={"width": "100%", "backgroundColor": "#ffffff", "padding": "10px", "borderRadius": "10px", "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.05)"},
                                 children=[
-                                    html.H5("Clean Composite Sum Signal", style={"fontWeight": "bold", "textAlign": "center"}),
+                                    html.H5("Clean Composite Sum Signal", style={"fontWeight": "bold", "textAlign": "center", "margin": "0 0 5px 0", "fontSize": "15px"}),
                                     dcc.Graph(id="plot-sum-signal"),
                                 ],
                             ),
@@ -102,7 +102,7 @@ def get_screen1_layout() -> html.Div:
                     ),
                     # Action Trigger Row
                     html.Div(
-                        style={"display": "flex", "justifyContent": "center", "marginTop": "30px"},
+                        style={"display": "flex", "justifyContent": "center", "marginTop": "15px"},
                         children=[
                             html.Button(
                                 "Let the models learn",

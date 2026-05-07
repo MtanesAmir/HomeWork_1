@@ -124,7 +124,34 @@ python3 src/main.py --mode ui --port 8050
 Once the server starts, open your browser and navigate to:
 👉 **`http://127.0.0.1:8050`**
 
----
+you have the first screen for choose your 4 sinoses and also to choose the 
+dataset size number of epochs and how the model size will be 
+
+![as you see here](image-1.png))
+
+then you het lets learn
+
+in the second screen you have the proccess of learning for each model with the error percentage on each 10 epochs
+![as you see here](image-2.png)
+
+then you hit lets play to move to the third screen
+
+in the third screen you will play with the model to see what each model guess on random slice of sinos sum
+
+you hit generate slice , and then choose the sinos you want the models to guess , you can choose each sinos to guess for itself. you can see the dots and as continued line.
+you can do it more and more , generate different slice and more
+
+when you want to finish you just hit exit
+
+![as you see here](image-3.png)
+
+
+
+### Training Insights & Architecture Comparisons
+
+*   **Effects of Epochs**: Increasing the number of epochs benefits the **RNN and LSTM** architectures significantly. Because recurrent connections process temporal sequences step-by-step, they require more learning cycles to stabilize gradients and capture long-term wave dependencies. FCNs converge much faster due to direct feedforward backpropagation.
+*   **Effects of Dataset Size**: Larger dataset sizes benefit all three models, but particularly **FCN and LSTM** to prevent overfitting. High-capacity layers stacked in a deep FCN learn complex spatial boundaries better with more samples, while multi-layered LSTMs require large datasets to optimize the dense forget/input/output gating weight parameters.
+*   **Favourite Model Selection**: **The LSTM model is our highly recommended favourite model!** By utilising gated recurrent structures (forget gates and memory cells) implemented fully via PyTorch tensors, it mimics real-world temporal signal extraction flawlessly, handles gradient clipping stably, and represents the most advanced, robust, and mathematically elegant approach to blind signal separation.
 
 ## Configuration
 
