@@ -120,3 +120,20 @@ def get_screen3_layout() -> html.Div:
             ),
         ],
     )
+
+
+def get_screen4_layout() -> html.Div:
+    """Returns the visual layout structure for Screen 4 (Delayed Safe Exit Splash View)."""
+    return html.Div(
+        style={"padding": "50px", "backgroundColor": "#f8f9fa", "minHeight": "100vh", "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center"},
+        children=[
+            html.Div(
+                style={"textAlign": "center", "backgroundColor": "#ffffff", "padding": "50px", "borderRadius": "15px", "boxShadow": "0 10px 25px rgba(0, 0, 0, 0.05)", "maxWidth": "600px"},
+                children=[
+                    html.H1("Bye Bye, hope you enjoy!!", style={"fontWeight": "bold", "color": "#dc3545", "marginBottom": "20px"}),
+                    html.P("Visual dashboard server is shutting down safely in the background.", style={"fontSize": "16px", "color": "#495057", "marginBottom": "10px"}),
+                    html.P("You can now safely close this browser tab.", style={"fontSize": "14px", "color": "#6c757d"}),
+                ]
+            )
+        ]
+    )

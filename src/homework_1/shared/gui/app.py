@@ -34,6 +34,9 @@ def route_page(pathname: str) -> html.Div:
         return get_screen2_layout()
     if pathname == "/playground":
         return get_screen3_layout()
+    if pathname == "/exit":
+        from homework_1.shared.gui.screen3 import get_screen4_layout
+        return get_screen4_layout()
     return get_screen1_layout()
 
 

@@ -35,7 +35,7 @@ def test_gui_screen2_layout() -> None:
     """Validates that Screen 2 layout instantiates progress structures properly."""
     layout = get_screen2_layout()
     assert layout is not None
-    assert len(layout.children) >= 4
+    assert len(layout.children) == 2  # Sidebar and Right Main Column
 
 
 def test_gui_screen3_layout() -> None:
@@ -118,7 +118,7 @@ def test_gui_screen2_async_progress_callback() -> None:
 def test_gui_screen3_playground_callbacks() -> None:
     """Asserts playground slice generator, continuous-dots styles, and model evaluation prediction loops."""
     # 1. Slices generator
-    fig_slice, x = handle_slice_generation(1)
+    fig_slice, x = handle_slice_generation(1, "lines", 100)
     assert 0 <= x <= 9990
     assert len(fig_slice.data) == 1
 
@@ -134,22 +134,26 @@ def test_gui_screen3_playground_callbacks() -> None:
 
 
 def test_gui_screen3_exit_callback() -> None:
-    """Asserts that the exit callback only triggers on positive explicit clicks and ignores premature loads."""
+    """Asserts that the exit callback only triggers on positive explicit clicks and redirects to /exit splash page."""
     # 1. Verify 0-clicks returns Dash NoUpdate
     import dash
     res = handle_server_exit(0)
     assert res == dash.no_update
 
-    # 2. Verify positive clicks gracefully sends SIGTERM shutdown
-    with pytest.raises(SystemExit):
-        # Mock os.kill using system exit in test harness context
-        import os
-        old_kill = os.kill
-        try:
-            os.kill = lambda pid, sig: sys.exit(0)
-            handle_server_exit(1)
-        finally:
-            os.kill = old_kill
+    # 2. Verify positive clicks redirects pathname to /exit splash route
+    res_ok = handle_server_exit(1)
+    assert res_ok == "/exit"
+
+    # Verify Screen 4 layout initializes correctly
+    from homework_1.shared.gui.screen3 import get_screen4_layout
+    s4_layout = get_screen4_layout()
+    assert s4_layout is not None
+    assert "Bye Bye" in s4_layout.children[0].children[0].children
+
+    # 3. Verify page routing rules map /exit path successfully
+    s4_routed = route_page("/exit")
+    assert s4_routed is not None
+    assert "Bye Bye" in s4_routed.children[0].children[0].children
 
 
 def test_gui_line_limits_constraint() -> None:
