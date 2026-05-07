@@ -63,44 +63,13 @@ def route_page(pathname: str) -> html.Div:
 def update_screen1_plots(*args: Any) -> Tuple[Any, Any]:
     """Updates component wave overlays and summed continuous curves in real-time on slider adjustments."""
     global current_clean_base_signals, current_clean_sum_signal
-    import math
-    import plotly.graph_objs as go
+    from homework_1.shared.gui.plots_helper import compute_and_draw_screen1_plots
 
-    # Map the 12 arguments into wave tuples (amp, freq, phase)
-    waves = []
-    for i in range(4):
-        waves.append((args[i * 3 + 2], args[i * 3], args[i * 3 + 1]))
-
-    # Compute samples over 10 seconds duration at 100 samples/second rate for fluid rendering
-    t_samples = [k / 100.0 for k in range(1000)]
-    base_signals = []
-    for amp, freq, phase in waves:
-        base_signals.append([amp * math.sin(2 * math.pi * freq * t + phase) for t in t_samples])
-
-    sum_signal = [sum(base_signals[i][k] for i in range(4)) for k in range(1000)]
+    fig_overlay, fig_sum, base_signals, sum_signal = compute_and_draw_screen1_plots(*args)
 
     # Caching variables for pipeline and E2E test queries
     current_clean_base_signals = base_signals
     current_clean_sum_signal = sum_signal
-
-    # Render Cartesian Figure A: Components overlays
-    fig_overlay = go.Figure()
-    for idx, sig in enumerate(base_signals):
-        fig_overlay.add_trace(go.Scatter(x=t_samples, y=sig, name=f"Sinusoid {idx + 1}"))
-    fig_overlay.update_layout(
-        margin={"l": 20, "r": 20, "t": 20, "b": 20},
-        xaxis_title="Time (s)",
-        yaxis_title="Amplitude",
-    )
-
-    # Render Cartesian Figure B: Sum signal
-    fig_sum = go.Figure()
-    fig_sum.add_trace(go.Scatter(x=t_samples, y=sum_signal, line_color="#0d6efd", name="Sum"))
-    fig_sum.update_layout(
-        margin={"l": 20, "r": 20, "t": 20, "b": 20},
-        xaxis_title="Time (s)",
-        yaxis_title="Amplitude",
-    )
 
     return fig_overlay, fig_sum
 
@@ -118,13 +87,18 @@ def update_screen1_plots(*args: Any) -> Tuple[Any, Any]:
         State("input-train-pct", "value"),
         State("input-val-pct", "value"),
         State("input-test-pct", "value"),
+        State("input-fcn-layers", "value"),
+        State("input-rnn-layers", "value"),
+        State("input-lstm-layers", "value"),
     ],
     prevent_initial_call=True,
 )
 def handle_training_start(
-    n_clicks: int, epochs: int, dataset_size: int, noise: float, train: float, val: float, test: float
+    n_clicks: int, epochs: int, dataset_size: int, noise: float,
+    train: float, val: float, test: float,
+    fcn_raw: str, rnn_raw: str, lstm_raw: str
 ) -> Tuple[Any, str]:
-    """Validates train/val/test percentages and triggers background data generation."""
+    """Validates splits, parses and validates model layers text strings, and triggers background setups."""
     global current_noised_sum_signal
 
     total = train + val + test
@@ -142,13 +116,42 @@ def handle_training_start(
         )
         return alert, dash.no_update
 
+    # Helper to safely parse comma-separated layers list
+    def parse_layers_string(raw_str: str, name: str) -> Tuple[List[int], str]:
+        if not raw_str or not raw_str.strip():
+            return [], f"⚠️ Error: {name} layers configuration input cannot be empty!"
+        try:
+            layers = [int(k.strip()) for k in raw_str.split(",") if k.strip()]
+            if not layers:
+                return [], f"⚠️ Error: {name} layers configuration cannot be empty!"
+            if any(val <= 0 for val in layers):
+                return [], f"⚠️ Error: {name} layers must be positive integers greater than 0!"
+            return layers, ""
+        except ValueError:
+            return [], f"⚠️ Error: {name} layers format must be a comma-separated list of integers (e.g. '3, 5, 3')!"
+
+    # Parse FCN, RNN, and LSTM layer lists
+    fcn_layers, err = parse_layers_string(fcn_raw, "FCN")
+    if err:
+        return html.Div(err, style={"padding": "12px", "backgroundColor": "#f8d7da", "color": "#842029", "borderRadius": "5px", "border": "1px solid #f5c2c7", "fontWeight": "bold"}), dash.no_update
+
+    rnn_layers, err = parse_layers_string(rnn_raw, "RNN")
+    if err:
+        return html.Div(err, style={"padding": "12px", "backgroundColor": "#f8d7da", "color": "#842029", "borderRadius": "5px", "border": "1px solid #f5c2c7", "fontWeight": "bold"}), dash.no_update
+
+    lstm_layers, err = parse_layers_string(lstm_raw, "LSTM")
+    if err:
+        return html.Div(err, style={"padding": "12px", "backgroundColor": "#f8d7da", "color": "#842029", "borderRadius": "5px", "border": "1px solid #f5c2c7", "fontWeight": "bold"}), dash.no_update
+
     # Push parameters updates to SDK setup configurations
     sdk.config_manager._setup_config["models"] = {
         "epochs": epochs,
         "train_percentage": train,
         "val_percentage": val,
         "test_percentage": test,
-        "hidden_layers": [3, 5, 3],
+        "hidden_layers": fcn_layers,
+        "rnn_layers": rnn_layers,
+        "lstm_layers": lstm_layers,
     }
 
     # Trigger base signals and dataset creation in the background

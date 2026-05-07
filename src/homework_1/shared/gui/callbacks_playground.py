@@ -93,9 +93,14 @@ def evaluate_models_predictions(choice: str, x: int, draw_mode: str) -> Tuple[go
 
     # Fallback to instantiation if models aren't cached in trained_models yet (e.g. mock testing context)
     import homework_1.shared.gui.callbacks_training as cb_t
-    fcn = cb_t.trained_models.get("FCN", FCNModel(14, [4], 10))
-    rnn = cb_t.trained_models.get("RNN", RNNModel(5, 8, 1))
-    lstm = cb_t.trained_models.get("LSTM", LSTMModel(5, 6, 1))
+    m_cfg = base_app.sdk.config_manager.get("models", {})
+    fcn_l = m_cfg.get("hidden_layers", [3, 5, 3])
+    rnn_l = m_cfg.get("rnn_layers", [8])
+    lstm_l = m_cfg.get("lstm_layers", [6])
+
+    fcn = cb_t.trained_models.get("FCN", FCNModel(14, fcn_l, 10))
+    rnn = cb_t.trained_models.get("RNN", RNNModel(5, rnn_l, 1))
+    lstm = cb_t.trained_models.get("LSTM", LSTMModel(5, lstm_l, 1))
 
     f_pred = fcn.get_prediction(input_vec)
     r_pred = rnn.get_prediction(input_vec)

@@ -43,26 +43,19 @@ def test_models_splits_warning() -> None:
 
 
 def test_models_fcn_layer_shapes() -> None:
-    """Validates that FCNModel dynamically builds weights and layers matching configured hidden profiles."""
+    """Validates that FCNModel dynamically builds weights and layers matching configured hidden profiles in PyTorch."""
     hidden_layers = [4, 8, 4]
     model = FCNModel(input_size=14, hidden_layers=hidden_layers, output_size=10)
 
-    # Layer count check: input + 3 hidden + output = 5 dimensions -> 4 weight matrices
-    assert len(model.W) == 4
-    assert len(model.b) == 4
+    # In our PyTorch sequential network, linear layers reside at indices 0, 2, 4, 6
+    layers = [model.network[idx] for idx in [0, 2, 4, 6]]
+    assert len(layers) == 4
 
-    # Matrix dimensions check: W_l has shape (output_l, input_l)
-    assert len(model.W[0]) == 4  # hidden_1
-    assert len(model.W[0][0]) == 14  # input
-
-    assert len(model.W[1]) == 8  # hidden_2
-    assert len(model.W[1][0]) == 4  # hidden_1
-
-    assert len(model.W[2]) == 4  # hidden_3
-    assert len(model.W[2][0]) == 8  # hidden_2
-
-    assert len(model.W[3]) == 10  # output
-    assert len(model.W[3][0]) == 4  # hidden_3
+    # Matrix dimensions check: weight shape is (out_features, in_features)
+    assert layers[0].weight.shape == (4, 14)
+    assert layers[1].weight.shape == (8, 4)
+    assert layers[2].weight.shape == (4, 8)
+    assert layers[3].weight.shape == (10, 4)
 
 
 def test_models_training_decrease_fcn() -> None:
@@ -103,7 +96,7 @@ def test_models_training_decrease_rnn() -> None:
     for _ in range(10):
         dummy_dataset.append({"key": [1.0] * 14, "value": [0.5] * 10})
 
-    model = RNNModel(input_size=5, hidden_size=6, output_size=1)
+    model = RNNModel(input_size=5, hidden_layers=[6], output_size=1)
 
     # Initial loss
     initial_loss = sum(
@@ -119,7 +112,7 @@ def test_models_training_decrease_rnn() -> None:
         train_pct=80.0,
         val_pct=10.0,
         test_pct=10.0,
-        learning_rate=0.2,
+        learning_rate=0.01,
     )
 
     final_loss = history["train_loss"][-1]
@@ -133,7 +126,7 @@ def test_models_training_decrease_lstm() -> None:
     for _ in range(10):
         dummy_dataset.append({"key": [1.0] * 14, "value": [0.5] * 10})
 
-    model = LSTMModel(input_size=5, hidden_size=6, output_size=1)
+    model = LSTMModel(input_size=5, hidden_layers=[6], output_size=1)
 
     # Initial loss
     initial_loss = sum(
@@ -149,7 +142,7 @@ def test_models_training_decrease_lstm() -> None:
         train_pct=80.0,
         val_pct=10.0,
         test_pct=10.0,
-        learning_rate=0.2,
+        learning_rate=0.01,
     )
 
     final_loss = history["train_loss"][-1]
@@ -170,7 +163,7 @@ def test_models_lstm_learning_convergence() -> None:
     for _ in range(15):
         dummy_dataset.append({"key": [1.0, 0.0, 0.0, 0.0] + [0.8] * 10, "value": [0.3] * 10})
 
-    model = LSTMModel(input_size=5, hidden_size=8, output_size=1)
+    model = LSTMModel(input_size=5, hidden_layers=[8], output_size=1)
     
     initial_loss = evaluate_loss(model, dummy_dataset)
 
@@ -182,7 +175,7 @@ def test_models_lstm_learning_convergence() -> None:
         train_pct=80.0,
         val_pct=10.0,
         test_pct=10.0,
-        learning_rate=0.1,
+        learning_rate=0.01,
     )
 
     final_loss = history["train_loss"][-1]

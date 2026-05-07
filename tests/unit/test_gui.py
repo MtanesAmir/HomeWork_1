@@ -53,16 +53,22 @@ def test_gui_page_routing() -> None:
 
 
 def test_gui_screen1_splits_validation() -> None:
-    """Asserts that Screen 1 split ratios validation warn banner renders correctly on invalid sums."""
-    # Invalid splits: 70% + 10% + 10% = 90%
-    alert, path = handle_training_start(1, 20, 100, 0.05, 70.0, 10.0, 10.0)
+    """Asserts that Screen 1 split ratios and layer parsing validation warn banners render correctly."""
+    # 1. Invalid splits: 70% + 10% + 10% = 90%
+    alert, path = handle_training_start(1, 20, 100, 0.05, 70.0, 10.0, 10.0, "3, 5, 3", "8", "6")
     assert alert is not None
     assert "Error" in alert.children
     import dash
     assert path == dash.no_update
 
-    # Valid splits: 70% + 15% + 15% = 100%
-    alert_ok, path_ok = handle_training_start(1, 20, 100, 0.05, 70.0, 15.0, 15.0)
+    # 2. Invalid FCN syntax parsing: non-integer layer values
+    alert_fcn, path_fcn = handle_training_start(1, 20, 100, 0.05, 70.0, 15.0, 15.0, "3, invalid, 3", "8", "6")
+    assert alert_fcn is not None
+    assert "FCN" in alert_fcn.children
+    assert path_fcn == dash.no_update
+
+    # 3. Valid inputs: 70% + 15% + 15% = 100% with deep layered custom recurrent sizes (RNN [8,8], LSTM [6,6])
+    alert_ok, path_ok = handle_training_start(1, 20, 100, 0.05, 70.0, 15.0, 15.0, "3, 5, 3", "8, 8", "6, 6")
     assert alert_ok is None
     assert path_ok == "/training"  # Redirects successfully
 

@@ -55,6 +55,13 @@ def get_screen1_layout() -> html.Div:
                     dcc.Input(id="input-val-pct", type="number", value=15.0, style={"width": "100%", "padding": "8px", "marginBottom": "15px", "borderRadius": "5px", "border": "1px solid #ced4da"}),
                     html.Label("Test Split (%)", style={"fontWeight": "bold"}),
                     dcc.Input(id="input-test-pct", type="number", value=15.0, style={"width": "100%", "padding": "8px", "marginBottom": "15px", "borderRadius": "5px", "border": "1px solid #ced4da"}),
+                    html.Hr(),
+                    html.Label("FCN Hidden Layers", style={"fontWeight": "bold"}),
+                    dcc.Input(id="input-fcn-layers", type="text", value="3, 5, 3", style={"width": "100%", "padding": "8px", "marginBottom": "15px", "borderRadius": "5px", "border": "1px solid #ced4da"}),
+                    html.Label("RNN Hidden Layers", style={"fontWeight": "bold"}),
+                    dcc.Input(id="input-rnn-layers", type="text", value="8", style={"width": "100%", "padding": "8px", "marginBottom": "15px", "borderRadius": "5px", "border": "1px solid #ced4da"}),
+                    html.Label("LSTM Hidden Layers", style={"fontWeight": "bold"}),
+                    dcc.Input(id="input-lstm-layers", type="text", value="6", style={"width": "100%", "padding": "8px", "marginBottom": "15px", "borderRadius": "5px", "border": "1px solid #ced4da"}),
                 ],
             ),
             # Right Panel Content (Cards + Plots)

@@ -150,8 +150,9 @@ class HomeWorkSDK:
             train_pct = model_cfg.get("train_percentage", 70.0)
             val_pct = model_cfg.get("val_percentage", 15.0)
             test_pct = model_cfg.get("test_percentage", 15.0)
+            rnn_lay = model_cfg.get("rnn_layers", [8])
 
-            model = RNNModel(input_size=5, hidden_size=8, output_size=1)
+            model = RNNModel(input_size=5, hidden_layers=rnn_lay, output_size=1)
             history = train_neural_network(
                 model=model,
                 dataset=dataset,
@@ -174,8 +175,9 @@ class HomeWorkSDK:
             train_pct = model_cfg.get("train_percentage", 70.0)
             val_pct = model_cfg.get("val_percentage", 15.0)
             test_pct = model_cfg.get("test_percentage", 15.0)
+            lstm_lay = model_cfg.get("lstm_layers", [6])
 
-            model = LSTMModel(input_size=5, hidden_size=6, output_size=1)
+            model = LSTMModel(input_size=5, hidden_layers=lstm_lay, output_size=1)
             history = train_neural_network(
                 model=model,
                 dataset=dataset,

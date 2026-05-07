@@ -67,6 +67,8 @@ def monitor_training_progress(n_intervals: int) -> tuple:
     model_cfg = sdk.config_manager.get("models", {})
     epochs = model_cfg.get("epochs", 20)
     hidden = model_cfg.get("hidden_layers", [3, 5, 3])
+    rnn_lay = model_cfg.get("rnn_layers", [8])
+    lstm_lay = model_cfg.get("lstm_layers", [6])
     train_pct = model_cfg.get("train_percentage", 70.0)
     val_pct = model_cfg.get("val_percentage", 15.0)
     test_pct = model_cfg.get("test_percentage", 15.0)
@@ -76,8 +78,8 @@ def monitor_training_progress(n_intervals: int) -> tuple:
         dataset = sdk._get_or_create_dataset()
         
         fcn = FCNModel(input_size=14, hidden_layers=hidden, output_size=10)
-        rnn = RNNModel(input_size=5, hidden_size=8, output_size=1)
-        lstm = LSTMModel(input_size=5, hidden_size=6, output_size=1)
+        rnn = RNNModel(input_size=5, hidden_layers=rnn_lay, output_size=1)
+        lstm = LSTMModel(input_size=5, hidden_layers=lstm_lay, output_size=1)
 
         trained_models = {"FCN": fcn, "RNN": rnn, "LSTM": lstm}
 
