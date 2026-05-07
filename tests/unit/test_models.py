@@ -16,6 +16,7 @@ from homework_1.services import (
     RNNModel,
 )
 from homework_1.services.models.trainer import (
+    evaluate_loss,
     partition_dataset,
     train_neural_network,
     validate_splits,
@@ -153,7 +154,43 @@ def test_models_training_decrease_lstm() -> None:
 
     final_loss = history["train_loss"][-1]
     print(f"LSTM Loss reduction: {initial_loss:.5f} -> {final_loss:.5f}")
+    # Assert training loss decreased
     assert final_loss < initial_loss
+
+    # Assert Test set evaluation isolation (intermediate indices must be placeholder 0.0s)
+    for t in range(len(history["test_loss"]) - 1):
+        assert history["test_loss"][t] == 0.0
+    # Only the final index evaluates
+    assert history["test_loss"][-1] > 0.0
+
+
+def test_models_lstm_learning_convergence() -> None:
+    """Validates robust LSTM BPTT mathematical convergence, ensuring training loss drops by at least 15%."""
+    dummy_dataset = []
+    for _ in range(15):
+        dummy_dataset.append({"key": [1.0, 0.0, 0.0, 0.0] + [0.8] * 10, "value": [0.3] * 10})
+
+    model = LSTMModel(input_size=5, hidden_size=8, output_size=1)
+    
+    initial_loss = evaluate_loss(model, dummy_dataset)
+
+    # Train LSTM for 30 epochs to assert math convergence
+    history = train_neural_network(
+        model=model,
+        dataset=dummy_dataset,
+        epochs=30,
+        train_pct=80.0,
+        val_pct=10.0,
+        test_pct=10.0,
+        learning_rate=0.1,
+    )
+
+    final_loss = history["train_loss"][-1]
+    percentage_drop = ((initial_loss - final_loss) / initial_loss) * 100.0
+    print(f"\n>> LSTM Convergence Drop: {initial_loss:.5f} -> {final_loss:.5f} (Drop: {percentage_drop:.1f}%)\n")
+
+    # Guarantee learning convergence by asserting drop is at least 15.0%
+    assert percentage_drop >= 15.0
 
 
 def test_line_limit_models_package() -> None:

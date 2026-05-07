@@ -22,7 +22,7 @@ def get_sinusoid_card(idx: int, default_freq: float, default_phase: float, defau
         children=[
             html.H5(f"Sinusoid {idx}", style={"textAlign": "center", "fontWeight": "bold", "color": "#495057"}),
             html.Label("Freq (Hz)", style={"fontWeight": "bold", "marginTop": "5px"}),
-            dcc.Slider(id=f"freq-{idx}", min=0.1, max=100.0, step=0.1, value=default_freq, tooltip={"placement": "bottom"}),
+            dcc.Slider(id=f"freq-{idx}", min=0.1, max=50.0, step=0.1, value=default_freq, tooltip={"placement": "bottom"}),
             html.Label("Phase (rad)", style={"fontWeight": "bold", "marginTop": "5px"}),
             dcc.Slider(id=f"phase-{idx}", min=-6.28, max=6.28, step=0.1, value=default_phase, tooltip={"placement": "bottom"}),
             html.Label("Amp", style={"fontWeight": "bold", "marginTop": "5px"}),

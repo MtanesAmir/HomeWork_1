@@ -73,16 +73,21 @@ def train_neural_network(
         # Record loss histories
         history["train_loss"].append(evaluate_loss(model, train_set))
         history["val_loss"].append(evaluate_loss(model, val_set))
-        history["test_loss"].append(evaluate_loss(model, test_set))
+        history["test_loss"].append(0.0)  # Use 0.0 as placeholder during epochs
 
         # Periodic Evaluation: after each 10 epochs (and epoch 1)
         if epoch == 1 or epoch % 10 == 0 or epoch == epochs:
             t_loss = history["train_loss"][-1]
             v_loss = history["val_loss"][-1]
-            te_loss = history["test_loss"][-1]
+            # Skip calculating test loss during training updates to save speed
             print(
                 f"[Epoch {epoch:02d}/{epochs}] "
-                f"Train Loss: {t_loss:.5f} | Val Loss: {v_loss:.5f} | Test Loss: {te_loss:.5f}"
+                f"Train Loss: {t_loss:.5f} | Val Loss: {v_loss:.5f} | Test Loss: (Evaluating at end...)"
             )
+
+    # Compute Test Set MSE exactly once, strictly at final epoch completion
+    history["test_loss"][-1] = evaluate_loss(model, test_set)
+    final_test = history["test_loss"][-1]
+    print(f"\n>> Training complete. Final Test Set MSE: {final_test:.5f}\n")
 
     return history

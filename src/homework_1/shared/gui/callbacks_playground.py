@@ -10,7 +10,7 @@ import signal
 from typing import Tuple
 
 import plotly.graph_objs as go
-from dash import Input, Output, State
+from dash import Input, Output, State, dash
 from homework_1.services import FCNModel, LSTMModel, RNNModel
 from homework_1.shared.gui.app import app, current_noised_sum_signal
 from homework_1.shared.gui.callbacks_training import trained_models
@@ -97,7 +97,10 @@ def evaluate_models_predictions(choice: str, x: int, draw_mode: str) -> Tuple[go
     prevent_initial_call=True,
 )
 def handle_server_exit(n_clicks: int) -> str:
-    """Safe exit callback sending SIGTERM process signal to close the Dash server."""
+    """Safe exit callback sending SIGTERM process signal to close the Dash server strictly on explicit clicks."""
+    if not n_clicks or n_clicks <= 0:
+        return dash.no_update
+
     print("\n🛑 Safe exit requested. Shutting down visual Dash dashboard server process...")
     os.kill(os.getpid(), signal.SIGTERM)
     return "/"
