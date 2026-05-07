@@ -109,10 +109,20 @@ HomeWork_1/
 ## Usage Guide
 
 ### Running the Main Entry Point
-To verify the complete setup and bootstrap execution, run:
+
+#### 1. Console CLI Simulation Mode (Default)
+To verify the pipeline setup and bootstrap execution on the terminal, run:
 ```bash
-python3 src/main.py
+python3 src/main.py --mode cli
 ```
+
+#### 2. Interactive Web Dashboard Mode (Recommended)
+To boot up the complete visual three-screen dashboard, execute:
+```bash
+python3 src/main.py --mode ui --port 8050
+```
+Once the server starts, open your browser and navigate to:
+👉 **`http://127.0.0.1:8050`**
 
 ---
 

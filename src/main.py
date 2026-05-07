@@ -1,101 +1,53 @@
 #!/usr/bin/env python3
 """Application main entry point.
 
-Bootstraps and demonstrates the homework_1 package functionalities.
+Bootstraps raw CLI executions OR boots up the interactive Dash visual server.
 """
 
+import argparse
 import sys
 
 from homework_1.sdk import HomeWorkSDK
 from homework_1.services import SinusWave
 
 
+def run_cli(sdk: HomeWorkSDK) -> None:
+    """Runs the E2E simulation pipelines on the console."""
+    print(f"Loaded SDK Version: {sdk.get_sdk_version()}")
+    # Generate base signals
+    clean_resp = sdk.generate_samples(1.0, 10.0, 0.0, 100, 0.1, 0.0)
+    print(f"Clean sinus count: {len(clean_resp['result'])}")
+
+    # Generate dataset
+    dataset_resp = sdk.generate_and_save_dataset(num_rows=50, noise_factor=0.05)
+    print(f"Dataset Pipeline Status: {dataset_resp['status']}")
+
+    # Train models
+    sdk.config_manager._setup_config["models"]["epochs"] = 20
+    fcn_train = sdk.train_fcn()
+    print(f"FCN Train Status: {fcn_train['status']}")
+
+
 def main() -> int:
-    """Main bootstrap function."""
-    print("=== Bootstrapping homework_1 SDK client ===")
+    """Main bootstrap entrypoint routing CLI pipelines or Visual Server boots."""
+    parser = argparse.ArgumentParser(description="homework_1 CLI & GUI Launcher")
+    parser.add_argument("--mode", type=str, default="cli", choices=["cli", "ui"], help="Launcher mode: cli or ui")
+    parser.add_argument("--port", type=int, default=8050, help="Dash visual server local port")
+    args = parser.parse_args()
+
+    print("=== Bootstrapping homework_1 System ===")
     try:
         sdk = HomeWorkSDK()
-        print(f"Loaded SDK Version: {sdk.get_sdk_version()}")
-
-        # --- Clean Sinus Sample Generation (Method 1) ---
-        print("\n--- Method 1: Clean Generated Sinus Samples ---")
-        # Generate 10 samples for a 10 Hz sine wave over 0.1s
-        clean_resp = sdk.generate_samples(
-            amplitude=1.0,
-            frequency=10.0,
-            phase=0.0,
-            samples_per_second=100,
-            seconds=0.1,
-            noise_factor=0.0,
-        )
-        print(f"Status: {clean_resp['status']}")
-        print(f"Samples Count: {len(clean_resp['result'])}")
-        print(f"First 5 Samples: {clean_resp['result'][:5]}")
-
-        # --- Noised Sinus Sample Generation (Method 2) ---
-        print("\n--- Method 2: Noised Generated Sinus Samples (10% Noise) ---")
-        noised_resp = sdk.generate_samples(
-            amplitude=1.0,
-            frequency=10.0,
-            phase=0.0,
-            samples_per_second=100,
-            seconds=0.1,
-            noise_factor=0.1,
-        )
-        print(f"Status: {noised_resp['status']}")
-        print(f"Samples Count: {len(noised_resp['result'])}")
-        print(f"First 5 Samples: {noised_resp['result'][:5]}")
-
-        # --- List Element-Wise Summation (Method 3) ---
-        print("\n--- Method 3: List Element-wise Summation of 3 Lists ---")
-        l1 = [1.0, 1.0, 1.0]
-        l2 = [10.0, 10.0, 10.0]
-        l3 = [100.0, 100.0, 100.0]
-        sum_list_resp = sdk.sum_samples([l1, l2, l3])
-        print(f"Status: {sum_list_resp['status']}")
-        print(f"Summed Output List: {sum_list_resp['result']}")
-
-        # --- Parametric Wave Summation (Method 4) ---
-        print("\n--- Method 4: Parametric Summation of 4 Waves ---")
-        w1 = SinusWave(amplitude=1.0, frequency=5.0, phase=0.0)
-        w2 = SinusWave(amplitude=1.5, frequency=10.0, phase=0.5)
-        w3 = SinusWave(amplitude=2.0, frequency=15.0, phase=1.0)
-        w4 = SinusWave(amplitude=0.5, frequency=20.0, phase=1.5)
-        sum_waves_resp = sdk.sum_waves(
-            waves=[w1, w2, w3, w4], samples_per_second=100, seconds=0.1, noise_factor=0.05
-        )
-        print(f"Status: {sum_waves_resp['status']}")
-        print(f"Summed Wave Count: {len(sum_waves_resp['result'])}")
-        print(f"First 5 Summed Samples: {sum_waves_resp['result'][:5]}")
-
-        # --- Dataset Generation Pipeline ---
-        print("\n--- Dataset Generation Pipeline ---")
-        dataset_resp = sdk.generate_and_save_dataset(num_rows=50, noise_factor=0.05)
-        print(f"Status: {dataset_resp['status']}")
-        print(f"Rows Generated: {dataset_resp['result']['rows_generated']}")
-        print(f"Database Saved To: {dataset_resp['result']['saved_to']}")
-
-        # --- Deep Learning Models Training ---
-        print("\n--- Deep Learning Models: FCN, RNN, LSTM Training ---")
-        # Configure quick 20-epoch runs for demonstration to show periodic prints (1, 10, 20)
-        sdk.config_manager._setup_config["models"]["epochs"] = 20
-
-        print("\n>> Training Fully Connected Network (FCN)...")
-        fcn_train = sdk.train_fcn()
-        print(f"FCN Train Status: {fcn_train['status']}")
-
-        print("\n>> Training Recurrent Neural Network (RNN)...")
-        rnn_train = sdk.train_rnn()
-        print(f"RNN Train Status: {rnn_train['status']}")
-
-        print("\n>> Training Long Short-Term Memory (LSTM)...")
-        lstm_train = sdk.train_lstm()
-        print(f"LSTM Train Status: {lstm_train['status']}")
-
-        print("\n=== Successful Bootstrap Execution ===")
+        if args.mode == "ui":
+            print(f"\n🚀 Starting visual dashboard server on: http://127.0.0.1:{args.port}")
+            from homework_1.shared.gui.app import app
+            app.run(debug=False, port=args.port)
+        else:
+            run_cli(sdk)
+        print("\n=== Clean Exit ===")
         return 0
     except Exception as e:
-        print(f"Error executing bootstrap: {e}", file=sys.stderr)
+        print(f"Error executing homework_1 bootstrap: {e}", file=sys.stderr)
         return 1
 
 
